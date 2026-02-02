@@ -15,17 +15,23 @@ h1, h2, h3, h4, p, button {
 img {
     width: 300px;
     transition: all 3s linear;
+    /* position: absolute; */
 }
 
 body {
     display: grid;
     place-content: center;
     
+    position: relative;
 }
 
-/* .d-none {
+.game-field {
+    
+}
+
+.d-none {
     display: none;
-}  */
+}  
 
 * {
     box-sizing: border-box;

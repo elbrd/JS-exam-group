@@ -36,10 +36,19 @@ function saveFormData() {
         oGameData.trainerGender = 'Girl';
         
         }
+
+      // startGame(); (?)
         
     }
-
+    
+    let submitBtnRef = document.querySelector('#submitBtn');
+    submitBtnRef.addEventListener('click', displayGameField);
     log(oGameData);
+}
+
+function displayGameField() {
+  let gameFieldRef = document.querySelector('#gameField');
+  gameFieldRef.classList.remove('d-none');
 }
   
 
@@ -99,10 +108,102 @@ function generatePokemons() {
     gameFieldRef.appendChild(imageRef);
     
     oGameData.pokemonNumbers.push(imageRef);
-    log(oGameData);
+    // log(oGameData);
     
   }
     
 }
 
+function catchPokemon(event) {
+
+  let targettedPokemon = event.target;
+  let currentSrc = targettedPokemon.getAttribute('src');
+  
+  
+  if(currentSrc === '../assets/ball.webp') {
+    targettedPokemon.src = `../assets/pokemons/${targettedPokemon.id}.png`;
+    oGameData.nmbrOfCaughtPokemons--;
+    
+  } else if(currentSrc !== '../assets/ball.webp') {
+    targettedPokemon.src = '../assets/ball.webp';
+    oGameData.nmbrOfCaughtPokemons++;
+  }
+  
+  log(oGameData.nmbrOfCaughtPokemons);
+}
+
 generatePokemons();
+
+function movePokemon() {
+  
+  setInterval(function () {
+
+    for (let i = 0; i < 10; i++) {
+  
+      let pokemonObj = oGameData.pokemonNumbers[i];
+      
+      let pokemonRef = document.getElementById(`${pokemonObj.id}`);
+  
+      pokemonRef.style.position = 'absolute';
+  
+      pokemonRef.style.left = oGameData.getLeftPosition() + 'px';
+      pokemonRef.style.top = oGameData.getTopPosition() + 'px';
+    
+    }
+    
+  }, 3000);
+
+  /*
+  while(oGameData.nmbrOfCaughtPokemons.length < 10) {
+
+    
+  }
+  */
+
+  
+}  
+
+
+movePokemon();
+
+/*
+function movePokemon() {
+
+  for (let i = 0; i < oGameData.pokemonNumbers.length; i++) {
+
+    const pokemonObj = oGameData.pokemonNumbers[i];
+
+    // 1. Hämta DOM-elementet
+    const pokemonEl = document.querySelector(`#${pokemonObj.id}`);
+
+    // 2. Se till att det går att flytta
+    pokemonEl.style.position = 'absolute';
+
+    // 3. Använd värden från objektet
+    pokemonEl.style.left = pokemonObj.left + 'px';
+    pokemonEl.style.top = pokemonObj.top + 'px';
+  }
+}
+*/
+
+
+// circle.style.top = Math.round(Math.random() * spaceWidth) + 'px';
+// circle.style.left = Math.round(Math.random() * spaceHeight) + 'px';
+/*
+var circle = document.getElementById('circle');
+var spaceWidth;
+var spaceHeight;
+
+function initCircle() {
+  spaceWidth = document.body.offsetHeight - parseInt(circle.style.height);
+  spaceHeight = document.body.offsetWidth - parseInt(circle.style.width);
+  circle.addEventListener('click', moveCircle)
+}
+
+function moveCircle() {
+  circle.style.top = Math.round(Math.random() * spaceWidth) + 'px';
+  circle.style.left = Math.round(Math.random() * spaceHeight) + 'px';
+}
+
+initCircle();
+*/
