@@ -6,6 +6,7 @@ log(new Date());
 // FORM
 
 setupForm();
+
 function setupForm() {
 
   let formRef = document.querySelector('#form');
@@ -37,22 +38,31 @@ function saveFormData() {
         
         }
 
-      // startGame(); (?)
+      startGame(); 
         
     }
     
-    let submitBtnRef = document.querySelector('#submitBtn');
-    submitBtnRef.addEventListener('click', displayGameField);
-    log(oGameData);
 }
 
-function displayGameField() {
+
+function startGame() {
+
+  let formWrapperRef = document.querySelector('#formWrapper');
+  formWrapperRef.classList.add('d-none');
+  
   let gameFieldRef = document.querySelector('#gameField');
   gameFieldRef.classList.remove('d-none');
+
+  let bodyRef = document.querySelector('body');
+  bodyRef.style.backgroundImage = "url('../assets/arena-background.png')";
+
+  oGameData.startTimeInMilliseconds();
+
+  generatePokemons();
+
+
 }
   
-
-
 function validateForm() {
 
   let nickRef = document.querySelector('#nick')
@@ -83,7 +93,7 @@ function validateForm() {
   return true;
 }
 
-// FÖRBEREDA SPELRUNDA
+// SPELRUNDA
 
 function generatePokemons() {
   
@@ -108,9 +118,11 @@ function generatePokemons() {
     gameFieldRef.appendChild(imageRef);
     
     oGameData.pokemonNumbers.push(imageRef);
-    // log(oGameData);
+    
     
   }
+
+  movePokemon();
     
 }
 
@@ -127,19 +139,23 @@ function catchPokemon(event) {
   } else if(currentSrc !== '../assets/ball.webp') {
     targettedPokemon.src = '../assets/ball.webp';
     oGameData.nmbrOfCaughtPokemons++;
+    endGame();
   }
   
   log(oGameData.nmbrOfCaughtPokemons);
 }
 
-generatePokemons();
-
 function movePokemon() {
   
-  setInterval(function () {
+  let intervalId = setInterval(function () {
+
+    if (checkForGameOver()) {
+      clearInterval(intervalId);
+      return;
+    }
 
     for (let i = 0; i < 10; i++) {
-  
+      
       let pokemonObj = oGameData.pokemonNumbers[i];
       
       let pokemonRef = document.getElementById(`${pokemonObj.id}`);
@@ -153,57 +169,107 @@ function movePokemon() {
     
   }, 3000);
 
-  /*
-  while(oGameData.nmbrOfCaughtPokemons.length < 10) {
-
-    
-  }
-  */
-
-  
 }  
 
 
-movePokemon();
+// AVSLUTA SPELRUNDA
 
-/*
-function movePokemon() {
+function checkForGameOver() {
 
-  for (let i = 0; i < oGameData.pokemonNumbers.length; i++) {
+  if(oGameData.nmbrOfCaughtPokemons >= 3) {
+    return true;
+  } else {
+    return false;
+  }
 
-    const pokemonObj = oGameData.pokemonNumbers[i];
+}
 
-    // 1. Hämta DOM-elementet
-    const pokemonEl = document.querySelector(`#${pokemonObj.id}`);
+function endGame() {
 
-    // 2. Se till att det går att flytta
-    pokemonEl.style.position = 'absolute';
-
-    // 3. Använd värden från objektet
-    pokemonEl.style.left = pokemonObj.left + 'px';
-    pokemonEl.style.top = pokemonObj.top + 'px';
+  if (checkForGameOver()) {
+    
+    const gameFieldRef = document.querySelector('#gameField');
+    const imagesRef = gameFieldRef.querySelectorAll('img');
+    imagesRef.forEach(img => img.remove());
+  
+    let highScoreRef = document.querySelector('#highScore');
+    highScoreRef.classList.remove('d-none');
+  
+    oGameData.endTimeInMilliseconds();
+    let gameTime = oGameData.nmbrOfMilliseconds();
+    log(gameTime);
+  
+    compareScore(gameTime);
   }
 }
-*/
 
+function compareScore(gameTime) {
 
-// circle.style.top = Math.round(Math.random() * spaceWidth) + 'px';
-// circle.style.left = Math.round(Math.random() * spaceHeight) + 'px';
-/*
-var circle = document.getElementById('circle');
-var spaceWidth;
-var spaceHeight;
+  let highScore = JSON.parse(localStorage.getItem('highScore')) || [];
 
-function initCircle() {
-  spaceWidth = document.body.offsetHeight - parseInt(circle.style.height);
-  spaceHeight = document.body.offsetWidth - parseInt(circle.style.width);
-  circle.addEventListener('click', moveCircle)
+  highScore.push({
+    
+    name : oGameData.trainerName,
+    age : oGameData.trainerAge,
+    gender : oGameData.trainerGender,
+    time : gameTime
+
+  });
+
+  // Sortera (snabbast tid först)
+  highScore.sort((a, b) => a.time - b.time);
+
+  // Behåll bara topp 10
+  highScore = highScore.slice(0, 9);
+
+  // Kolla så spelrundans resultat är kvar
+  let isTop10 = highScore.some(
+    score => score.name === oGameData.trainerName && score.time === gameTime          
+  );
+
+  // Om ovan är sant så sparas den uppdaterade arrayen, om inte görs inget
+  if(isTop10) {
+    
+    localStorage.setItem('highScore', JSON.stringify(highScore));
+    
+  }
+
+  displayHighScore();
+  
 }
 
-function moveCircle() {
-  circle.style.top = Math.round(Math.random() * spaceWidth) + 'px';
-  circle.style.left = Math.round(Math.random() * spaceHeight) + 'px';
+function displayHighScore() {
+  let highScore = JSON.parse(localStorage.getItem('highScore'));
+
+  for (let i = 0; i < highScore.length; i++) {
+    const currentScore = highScore[i];
+    const listItemRef = document.createElement('li');
+    const highScoreListRef = document.querySelector('#highscoreList');
+
+    listItemRef.textContent = `${currentScore.name}, ${currentScore.age} år, 
+    ${currentScore.gender}, ${currentScore.time} ms`;
+    
+    highScoreListRef.appendChild(listItemRef);
+    
+    let playAgainBtnRef = document.querySelector('#playAgainBtn');
+    playAgainBtnRef.addEventListener('click', resetGame);
+    log(highScore);
+  }
+  
 }
 
-initCircle();
-*/
+function resetGame() {
+
+  let formWrapperRef = document.querySelector('#formWrapper');
+  formWrapperRef.classList.remove('d-none');
+  
+  let gameFieldRef = document.querySelector('#gameField');
+  gameFieldRef.classList.add('d-none');
+
+  let bodyRef = document.querySelector('body');
+  bodyRef.style.backgroundImage = '';
+
+  oGameData.init();
+  log(oGameData);
+
+}
