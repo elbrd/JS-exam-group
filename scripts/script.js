@@ -3,13 +3,51 @@ const log = (msg) => console.log(msg);
 // I denna fil skriver ni all er kod
 log(new Date());
 
+function setupMusic() {
+  
+  const audioBtnRef = document.querySelector('.audio-btn');
+  audioBtnRef.addEventListener('click', playPauseMusic);
+
+  const audioRef = document.querySelector('audio');
+  audioRef.load();
+  
+}
+  
+// MUSIC 
+
+function playPauseMusic() {
+  const audioBtnRef = document.querySelector('.audio-btn');
+  const audioRef = document.querySelector('audio');
+  const audioImageRef = document.querySelector('.audio-img');
+
+  if (audioRef.paused) {
+    audioRef.play();
+    audioImageRef.src = './assets/audio.png';
+  
+  } else {
+    audioRef.pause();
+    audioImageRef.src = './assets/audio-mute.png';
+  }
+
+}
+
+
+
+
+
 // FORM
 
 setupForm();
 
 function setupForm() {
 
+  let gameFieldRef = document.querySelector('#gameField');
+  gameFieldRef.classList.add('d-none');
+ 
   let formRef = document.querySelector('#form');
+
+  const audioBtnRef = document.querySelector('.audio-btn');
+  // audioBtnRef.classList.add('d-none');
 
   formRef.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -44,25 +82,6 @@ function saveFormData() {
     
 }
 
-
-function startGame() {
-
-  let formWrapperRef = document.querySelector('#formWrapper');
-  formWrapperRef.classList.add('d-none');
-  
-  let gameFieldRef = document.querySelector('#gameField');
-  gameFieldRef.classList.remove('d-none');
-
-  let bodyRef = document.querySelector('body');
-  bodyRef.style.backgroundImage = "url('../assets/arena-background.png')";
-
-  oGameData.startTimeInMilliseconds();
-
-  generatePokemons();
-
-
-}
-  
 function validateForm() {
 
   let nickRef = document.querySelector('#nick')
@@ -95,6 +114,38 @@ function validateForm() {
 
 // SPELRUNDA
 
+function startGame() {
+  
+  generatePokemons();
+  
+  setTimeout(function () {
+    
+    let formWrapperRef = document.querySelector('#formWrapper');
+    formWrapperRef.classList.add('d-none');
+    
+    let gameFieldRef = document.querySelector('#gameField');
+    gameFieldRef.classList.remove('d-none');
+    
+    let highScoreRef = document.querySelector('#highScore');
+    highScoreRef.classList.add('d-none');
+    
+    let bodyRef = document.querySelector('body');
+    bodyRef.style.backgroundImage = "url('../assets/arena-background.png')";
+    
+    oGameData.startTimeInMilliseconds();
+    
+    setupMusic();
+
+    const audioBtnRef = document.querySelector('.audio-btn');
+    audioBtnRef.classList.remove('d-none');
+
+    const audioRef = document.querySelector('audio');
+    audioRef.play();
+  
+  }, 3000);
+
+}
+  
 function generatePokemons() {
   
   for (let i = 0; i < 10; i++) {
@@ -109,6 +160,7 @@ function generatePokemons() {
     }
       
     let imageRef = document.createElement('img');
+    imageRef.classList.add(randomIndex);
     imageRef.id = randomIndex;
     imageRef.src = `../assets/pokemons/${randomIndex}.png`;
 
@@ -118,12 +170,9 @@ function generatePokemons() {
     gameFieldRef.appendChild(imageRef);
     
     oGameData.pokemonNumbers.push(imageRef);
-    
-    
   }
 
   movePokemon();
-    
 }
 
 function catchPokemon(event) {
@@ -141,9 +190,8 @@ function catchPokemon(event) {
     oGameData.nmbrOfCaughtPokemons++;
     endGame();
   }
-  
-  log(oGameData.nmbrOfCaughtPokemons);
 }
+
 
 function movePokemon() {
   
@@ -154,29 +202,24 @@ function movePokemon() {
       return;
     }
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < oGameData.pokemonNumbers.length; i++) {
       
       let pokemonObj = oGameData.pokemonNumbers[i];
-      
-      let pokemonRef = document.getElementById(`${pokemonObj.id}`);
-  
-      pokemonRef.style.position = 'absolute';
-  
-      pokemonRef.style.left = oGameData.getLeftPosition() + 'px';
-      pokemonRef.style.top = oGameData.getTopPosition() + 'px';
+      pokemonObj.style.left = oGameData.getLeftPosition() + 'px';
+      pokemonObj.style.top = oGameData.getTopPosition() + 'px';
     
     }
     
   }, 3000);
 
-}  
+}
 
 
 // AVSLUTA SPELRUNDA
 
 function checkForGameOver() {
 
-  if(oGameData.nmbrOfCaughtPokemons >= 3) {
+  if(oGameData.nmbrOfCaughtPokemons >= 10) {
     return true;
   } else {
     return false;
@@ -192,12 +235,8 @@ function endGame() {
     const imagesRef = gameFieldRef.querySelectorAll('img');
     imagesRef.forEach(img => img.remove());
   
-    let highScoreRef = document.querySelector('#highScore');
-    highScoreRef.classList.remove('d-none');
-  
     oGameData.endTimeInMilliseconds();
     let gameTime = oGameData.nmbrOfMilliseconds();
-    log(gameTime);
   
     compareScore(gameTime);
   }
@@ -220,7 +259,7 @@ function compareScore(gameTime) {
   highScore.sort((a, b) => a.time - b.time);
 
   // Behåll bara topp 10
-  highScore = highScore.slice(0, 9);
+  highScore = highScore.slice(0, 10);
 
   // Kolla så spelrundans resultat är kvar
   let isTop10 = highScore.some(
@@ -239,22 +278,35 @@ function compareScore(gameTime) {
 }
 
 function displayHighScore() {
+  
   let highScore = JSON.parse(localStorage.getItem('highScore'));
+  const highScoreListRef = document.querySelector('#highscoreList');
+  highScoreListRef.innerHTML = '';
 
+  const highScoreRef = document.querySelector('#highScore');
+  highScoreRef.classList.remove('d-none');
+
+  
+  const audioBtnRef = document.querySelector('.audio-btn');
+  audioBtnRef.classList.add('d-none');
+
+  const audioRef = document.querySelector('audio');
+  audioRef.pause();
+  
+  
   for (let i = 0; i < highScore.length; i++) {
     const currentScore = highScore[i];
     const listItemRef = document.createElement('li');
-    const highScoreListRef = document.querySelector('#highscoreList');
 
     listItemRef.textContent = `${currentScore.name}, ${currentScore.age} år, 
     ${currentScore.gender}, ${currentScore.time} ms`;
     
     highScoreListRef.appendChild(listItemRef);
     
-    let playAgainBtnRef = document.querySelector('#playAgainBtn');
-    playAgainBtnRef.addEventListener('click', resetGame);
-    log(highScore);
   }
+
+  let playAgainBtnRef = document.querySelector('#playAgainBtn');
+  playAgainBtnRef.addEventListener('click', resetGame);
   
 }
 
@@ -266,10 +318,13 @@ function resetGame() {
   let gameFieldRef = document.querySelector('#gameField');
   gameFieldRef.classList.add('d-none');
 
+  let highScoreRef = document.querySelector('#highScore');
+  highScoreRef.classList.add('d-none');
+
   let bodyRef = document.querySelector('body');
   bodyRef.style.backgroundImage = '';
 
   oGameData.init();
-  log(oGameData);
 
 }
+
