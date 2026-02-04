@@ -15,11 +15,11 @@ h1, h2, h3, h4, p, button {
 img {
     width: 300px;
     transition: all 3s linear;
-    /* position: absolute; */
+    position: absolute;
 }
 
 .d-none {
-    display: none;
+    display: none !important;
 }  
 
 * {
@@ -39,6 +39,26 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     
+}
+
+.audio-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem; 
+    display: grid;
+    border-radius: 8px;
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    place-items: center;
+
+    color: white;
+}
+
+.audio-img {
+    /* margin-top: 5px; */
+    width: 32px;
+    height: 32px;
 }
 
 .form-wrapper {
@@ -80,9 +100,41 @@ body {
         color: white;
         border: none;
         border-radius: 10px;
+        font-size: 1.5rem;
     }
 
     button:hover {
         background-color: rgb(128, 128, 242);
+    }
+}
+
+#highScore {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    border-radius: 10px;
+    gap: 1rem;
+    padding: 1rem;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.662);
+
+    h1 {
+        text-align: center;
+    }
+
+    ol {
+      padding: 0 1rem 0 1rem;
+      margin: 0;
+      
+    }
+
+    button {
+        cursor: pointer;
+        padding: 1rem;
+        background-color: rgb(109, 109, 241);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.5rem;
     }
 }

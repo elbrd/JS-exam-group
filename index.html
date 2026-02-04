@@ -34,10 +34,10 @@
     </section>
 
     <!-- GAME FIELD -->
-    <section id="gameField" class="game-field d-none">
-        <section class="high-score d-none" id="highScore">
+    <section id="gameField" class="game-field">
+        <section class="high-score" id="highScore">
             <h1>Congratulations!</h1>
-            <h3 id="winMsg"></h3>
+            <!-- <h3 id="winMsg"></h3> -->
             <ol class="highscore-list" id="highscoreList">
               
             </ol>
@@ -47,5 +47,6 @@
     
     <!-- Läs in audioelementet från DOMen. För att spela .play(), för att pausa .pause(), för att starta om .load()  -->
     <audio src="./assets/pokemon_vs_trainer.mp3"></audio>
+    <button class="audio-btn d-none"><img src="./assets/audio.png" alt="Volume" class="audio-img"></button>
   </body>
 </html>
