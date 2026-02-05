@@ -1,0 +1,59 @@
+FORMULÄR
+1. Validera formulär efter beskrivning => validateForm()
+2. Om validering returnerar True spara ner i oGameData => saveData()
+
+
+SPELRUNDA
+1. Förbereda spelrunda: 
+  - Nollställa oGameData => init (metod på objektet)
+
+  - Slumpa 10 pokemons från 'assets\pokemons' => generatePokemons()
+    - Behövs även en funktion för att 'skapa' pokemons? Eller räcker det att skapa en 'IMG' tagg och lyfta in rätt PNG från mappen i samma funktion?
+
+    // Från Pokemonexemplet:
+    for(let i = 0; i < teamSize; i++) {
+            const randomIndex = Math.floor(Math.random() * pokemonsTemp.length);
+            const randomPokemon = pokemonsTemp.splice(randomIndex, 1)[0];
+            team.push(randomPokemon);
+    }
+
+    - Behöver lägga till en lyssnare på alla bilder:
+      "addEventListener("mouseover", (event) => { })
+
+      onmouseover = (event) => { }"
+
+
+2. Initiera spelrunda => startGame();
+  - Starta timer => startTimeInMilliseconds(); (metod på objektet)
+
+  - Starta spelmusik (Läs in audioelementet från DOMen. För att spela .play(), för att pausa .pause(), för att starta om .load())
+  
+  - Visa slumpade pokemons från 'generatePokemons()' på skärmen
+
+  - Ändra vy, ska bli annan bakgrund/sida
+  
+
+3. Spela spelrunda
+  - 'Var 3e sekund får varje pokemon en ny position', något som bakas in redan på 'generatePokemons()'? 
+    - Saker att använda för detta:
+      - 'transition: all 3s linear'
+      - getLeftPosition
+      - getTopPosition
+
+  - Vid hover över pokemon => catchPokemon()
+    - Pusha pokemon till 'catchedPokemonArray' (?)
+
+  - Vid hover över pokeboll (redan fångad pokemon) => releasePokemon()
+    - 
+
+  - Efter varje fångad pokemon => checkForGameOver()?
+
+  
+4. Avsluta spelrunda => checkForGameOver
+  - Om True 
+    - endTimeInMilliseconds()
+    - nmbrOfMilliseconds()
+    - Jämför mot HighScore => compareScore()
+      - Om tid är nog bra spara ner i HighScore
+    - Visa HighScore-vy
+
