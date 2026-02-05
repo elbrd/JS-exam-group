@@ -122,9 +122,15 @@ body {
         text-align: center;
     }
 
+    h3 {
+        text-align: center;
+    }
+
     ol {
       padding: 0 1rem 0 1rem;
       margin: 0;
+      display: grid;
+      gap: 0.5rem;
       
     }
 

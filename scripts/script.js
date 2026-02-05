@@ -3,8 +3,10 @@ const log = (msg) => console.log(msg);
 // I denna fil skriver ni all er kod
 log(new Date());
 
+// MUSIC 
+
 function setupMusic() {
-  
+
   const audioBtnRef = document.querySelector('.audio-btn');
   audioBtnRef.addEventListener('click', playPauseMusic);
 
@@ -13,10 +15,8 @@ function setupMusic() {
   
 }
   
-// MUSIC 
-
 function playPauseMusic() {
-  const audioBtnRef = document.querySelector('.audio-btn');
+
   const audioRef = document.querySelector('audio');
   const audioImageRef = document.querySelector('.audio-img');
 
@@ -31,10 +31,6 @@ function playPauseMusic() {
 
 }
 
-
-
-
-
 // FORM
 
 setupForm();
@@ -45,9 +41,6 @@ function setupForm() {
   gameFieldRef.classList.add('d-none');
  
   let formRef = document.querySelector('#form');
-
-  const audioBtnRef = document.querySelector('.audio-btn');
-  // audioBtnRef.classList.add('d-none');
 
   formRef.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -71,7 +64,7 @@ function saveFormData() {
         oGameData.trainerAge = ageRef.value;
         if (radioBoyRef.checked) {
         oGameData.trainerGender = 'Boy';
-        } else {
+        } else if (radioGirlRef.checked) {
         oGameData.trainerGender = 'Girl';
         
         }
@@ -118,31 +111,31 @@ function startGame() {
   
   generatePokemons();
   
-  setTimeout(function () {
-    
-    let formWrapperRef = document.querySelector('#formWrapper');
-    formWrapperRef.classList.add('d-none');
-    
-    let gameFieldRef = document.querySelector('#gameField');
-    gameFieldRef.classList.remove('d-none');
-    
-    let highScoreRef = document.querySelector('#highScore');
-    highScoreRef.classList.add('d-none');
-    
-    let bodyRef = document.querySelector('body');
-    bodyRef.style.backgroundImage = "url('../assets/arena-background.png')";
-    
-    oGameData.startTimeInMilliseconds();
-    
-    setupMusic();
-
-    const audioBtnRef = document.querySelector('.audio-btn');
-    audioBtnRef.classList.remove('d-none');
-
-    const audioRef = document.querySelector('audio');
-    audioRef.play();
+  let formWrapperRef = document.querySelector('#formWrapper');
+  formWrapperRef.classList.add('d-none');
   
+  let gameFieldRef = document.querySelector('#gameField');
+  gameFieldRef.classList.remove('d-none');
+  
+  let highScoreRef = document.querySelector('#highScore');
+  highScoreRef.classList.add('d-none');
+  
+  let bodyRef = document.querySelector('body');
+  bodyRef.style.backgroundImage = "url('../assets/arena-background.png')";
+  
+  setupMusic();
+  
+  const audioBtnRef = document.querySelector('.audio-btn');
+  audioBtnRef.classList.remove('d-none');
+  
+  const audioRef = document.querySelector('audio');
+  audioRef.play();
+
+  setTimeout(() => {
+    enablePokemonCatch();
+    oGameData.startTimeInMilliseconds();
   }, 3000);
+
 
 }
   
@@ -153,10 +146,8 @@ function generatePokemons() {
     let randomIndex = Math.floor(Math.random() * 151 + 1);
     randomIndex = randomIndex.toString();
 
-    if(randomIndex.length === 2) {
-        randomIndex = randomIndex.padStart(3, '0');
-    } else if(randomIndex.length === 1) {
-        randomIndex = randomIndex.padStart(3, '0');
+    if(randomIndex.length === 1 || randomIndex.length === 2) {
+      randomIndex = randomIndex.padStart(3, '0');
     }
       
     let imageRef = document.createElement('img');
@@ -164,7 +155,13 @@ function generatePokemons() {
     imageRef.id = randomIndex;
     imageRef.src = `../assets/pokemons/${randomIndex}.png`;
 
-    imageRef.addEventListener('mouseover', catchPokemon);
+    for (let i = 0; i < oGameData.pokemonNumbers.length; i++) {
+      
+      let pokemonObj = oGameData.pokemonNumbers[i];
+      pokemonObj.style.left = oGameData.getLeftPosition() + 'px';
+      pokemonObj.style.top = oGameData.getTopPosition() + 'px';
+    
+    }
 
     let gameFieldRef = document.querySelector('#gameField');
     gameFieldRef.appendChild(imageRef);
@@ -173,29 +170,12 @@ function generatePokemons() {
   }
 
   movePokemon();
+
 }
-
-function catchPokemon(event) {
-
-  let targettedPokemon = event.target;
-  let currentSrc = targettedPokemon.getAttribute('src');
-  
-  
-  if(currentSrc === '../assets/ball.webp') {
-    targettedPokemon.src = `../assets/pokemons/${targettedPokemon.id}.png`;
-    oGameData.nmbrOfCaughtPokemons--;
-    
-  } else if(currentSrc !== '../assets/ball.webp') {
-    targettedPokemon.src = '../assets/ball.webp';
-    oGameData.nmbrOfCaughtPokemons++;
-    endGame();
-  }
-}
-
 
 function movePokemon() {
   
-  let intervalId = setInterval(function () {
+  let intervalId = setInterval(() => {
 
     if (checkForGameOver()) {
       clearInterval(intervalId);
@@ -214,12 +194,39 @@ function movePokemon() {
 
 }
 
+function catchPokemon(event) {
+
+  let targettedPokemon = event.target;
+  let currentSrc = targettedPokemon.getAttribute('src');
+  
+  
+  if(currentSrc === '../assets/ball.webp') {
+    targettedPokemon.src = `../assets/pokemons/${targettedPokemon.id}.png`;
+    oGameData.nmbrOfCaughtPokemons--;
+    
+  } else if(currentSrc !== '../assets/ball.webp') {
+    targettedPokemon.src = '../assets/ball.webp';
+    oGameData.nmbrOfCaughtPokemons++;
+    endGame();
+  }
+
+}
+
+function enablePokemonCatch() {
+
+  for (let i = 0; i < oGameData.pokemonNumbers.length; i++) {
+    let pokemon = oGameData.pokemonNumbers[i];
+    pokemon.addEventListener('mouseover', catchPokemon);
+  }
+
+}
+
 
 // AVSLUTA SPELRUNDA
 
 function checkForGameOver() {
 
-  if(oGameData.nmbrOfCaughtPokemons >= 10) {
+  if(oGameData.nmbrOfCaughtPokemons >= 3) {
     return true;
   } else {
     return false;
@@ -237,8 +244,9 @@ function endGame() {
   
     oGameData.endTimeInMilliseconds();
     let gameTime = oGameData.nmbrOfMilliseconds();
-  
+
     compareScore(gameTime);
+    displayHighScore(gameTime);
   }
 }
 
@@ -262,41 +270,50 @@ function compareScore(gameTime) {
   highScore = highScore.slice(0, 10);
 
   // Kolla så spelrundans resultat är kvar
-  let isTop10 = highScore.some(
+  const isInTop10 = highScore.some(
     score => score.name === oGameData.trainerName && score.time === gameTime          
   );
 
   // Om ovan är sant så sparas den uppdaterade arrayen, om inte görs inget
-  if(isTop10) {
+  if(isInTop10) {
     
     localStorage.setItem('highScore', JSON.stringify(highScore));
     
   }
-
-  displayHighScore();
-  
+ 
 }
 
-function displayHighScore() {
+function displayHighScore(gameTime) {
   
-  let highScore = JSON.parse(localStorage.getItem('highScore'));
+  const highScore = JSON.parse(localStorage.getItem('highScore'));
+
   const highScoreListRef = document.querySelector('#highscoreList');
   highScoreListRef.innerHTML = '';
-
+  
   const highScoreRef = document.querySelector('#highScore');
   highScoreRef.classList.remove('d-none');
 
-  
+  const winMsgRef = document.querySelector('#winMsg');
+  winMsgRef.innerText = `Din tid: ${gameTime} ms`;
+    
   const audioBtnRef = document.querySelector('.audio-btn');
   audioBtnRef.classList.add('d-none');
+
+  const audioImageRef = document.querySelector('img');
+  audioImageRef.src = './assets/audio.png';
 
   const audioRef = document.querySelector('audio');
   audioRef.pause();
   
-  
   for (let i = 0; i < highScore.length; i++) {
     const currentScore = highScore[i];
+    
     const listItemRef = document.createElement('li');
+    
+    if (currentScore.name === oGameData.trainerName && currentScore.time === gameTime) {
+      listItemRef.style.border = '2px solid red';
+      listItemRef.style.borderRadius = '8px';
+    }
 
     listItemRef.textContent = `${currentScore.name}, ${currentScore.age} år, 
     ${currentScore.gender}, ${currentScore.time} ms`;
@@ -314,6 +331,9 @@ function resetGame() {
 
   let formWrapperRef = document.querySelector('#formWrapper');
   formWrapperRef.classList.remove('d-none');
+
+  let errorMsgRef = document.querySelector('#error-msg')
+  errorMsgRef.textContent = '';
   
   let gameFieldRef = document.querySelector('#gameField');
   gameFieldRef.classList.add('d-none');
