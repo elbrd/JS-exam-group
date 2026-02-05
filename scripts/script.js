@@ -226,7 +226,7 @@ function enablePokemonCatch() {
 
 function checkForGameOver() {
 
-  if(oGameData.nmbrOfCaughtPokemons >= 3) {
+  if(oGameData.nmbrOfCaughtPokemons >= 10) {
     return true;
   } else {
     return false;
